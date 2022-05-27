@@ -79,6 +79,7 @@ public final class GameInstance {
         return new GameInstance(instance);
     }
 
+    //    @SuppressWarnings("all")
     public static List<GameInstance> parseInstancesFromList(List<String> instances) throws SaveProcessingException {
         List<GameInstance> gameInstances = new ArrayList<>();
 
@@ -105,9 +106,6 @@ public final class GameInstance {
                     JOptionPane.showMessageDialog(null, "102", "报错", JOptionPane.WARNING_MESSAGE);
 
                     throw new SaveProcessingException("102 Error occurred when reading save file: invalid char: " + (char) result.getAsInt());
-                }if (!(s.equals("w") || s.equals("b"))) {
-                    JOptionPane.showMessageDialog(null, "103", "报错", JOptionPane.WARNING_MESSAGE);
-                    throw new SaveProcessingException("103 Error occurred when reading save file: invalid current color.");
                 }
             }
 
@@ -125,7 +123,11 @@ public final class GameInstance {
                 tmpChessboard = new ArrayList<>(); // Don't use clear()
                 rowCount = 0;
             }
+        }
 
+        if (rowCount != 9) {
+            JOptionPane.showMessageDialog(null, "103", "报错", JOptionPane.WARNING_MESSAGE);
+            throw new SaveProcessingException("103 Error occurred when reading save file: invalid current color.");
         }
 
         return gameInstances;
