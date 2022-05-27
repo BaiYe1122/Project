@@ -25,7 +25,7 @@ public abstract class ChessComponent extends JComponent {
     private boolean theme;
     public boolean CanMovePoints = false;
     private Chessboard chessboard;
-    private ClickController clickController;
+    public ClickController clickController;
     private ChessboardPoint chessboardPoint;
     protected final ChessColor chessColor;
     private boolean selected;

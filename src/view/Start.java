@@ -14,9 +14,9 @@ public class Start extends JFrame {
     }
 
     public Start() {
-        setLocation(300,200);
-        setSize(900, 600);
+        setSize(1200, 600);
         setLayout(null);
+        setLocationRelativeTo(null);
 
         JButton StartButton = new JButton("Play");
         StartButton.setLocation(0, 0);
@@ -50,7 +50,15 @@ public class Start extends JFrame {
         ExitButton.addActionListener(e -> {
             System.exit(0);
         });
-
+        JButton OnlineButton = new JButton("Online");
+        OnlineButton.setLocation(900, 0);
+        OnlineButton.setSize(300, 600);
+        OnlineButton.setFont(new Font("Rockwell", Font.BOLD, 50));
+        add(OnlineButton);
+        OnlineButton.addActionListener(e -> {
+            new Login(this, Style);
+            setVisible(false);
+        });
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }

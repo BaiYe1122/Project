@@ -1,5 +1,6 @@
 package model;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -94,26 +95,37 @@ public final class GameInstance {
 
             if (rowCount % 9 != 0) {
                 if (s.length() != 8) {
-                    throw new SaveProcessingException("Error occurred when reading save file: column count different from 8.");
+                    JOptionPane.showMessageDialog(null, "101", "报错", JOptionPane.WARNING_MESSAGE);
+                    throw new SaveProcessingException("101 Error occurred when reading save file: column count different from 8.");
                 }
 
                 OptionalInt result = s.chars().filter(e -> !classMap.containsKey(Character.toLowerCase((char) e))).findAny();
 
                 if (result.isPresent()) {
-                    throw new SaveProcessingException("Error occurred when reading save file: invalid char: " + (char) result.getAsInt());
+                    JOptionPane.showMessageDialog(null, "102", "报错", JOptionPane.WARNING_MESSAGE);
+
+                    throw new SaveProcessingException("102 Error occurred when reading save file: invalid char: " + (char) result.getAsInt());
+                }if (!(s.equals("w") || s.equals("b"))) {
+                    JOptionPane.showMessageDialog(null, "103", "报错", JOptionPane.WARNING_MESSAGE);
+                    throw new SaveProcessingException("103 Error occurred when reading save file: invalid current color.");
                 }
             }
 
             tmpChessboard.add(s);
 
             if (rowCount == 9) {
+                if (s.length() != 1) {
+                    throw new SaveProcessingException("101 Error occurred when reading save file: column count different from 8.");
+                }
                 if (!(s.equals("w") || s.equals("b"))) {
-                    throw new SaveProcessingException("Error occurred when reading save file: invalid current color.");
+                    JOptionPane.showMessageDialog(null, "103", "报错", JOptionPane.WARNING_MESSAGE);
+                    throw new SaveProcessingException("103 Error occurred when reading save file: invalid current color.");
                 }
                 gameInstances.add(new GameInstance(tmpChessboard));
                 tmpChessboard = new ArrayList<>(); // Don't use clear()
                 rowCount = 0;
             }
+
         }
 
         return gameInstances;

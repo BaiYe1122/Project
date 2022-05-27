@@ -1,6 +1,8 @@
 package view;
 
 import controller.GameController;
+import controller.OnlineController;
+import model.SaveProcessingException;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -23,6 +25,9 @@ import java.util.List;
  */
 public class ChessGameFrame extends JFrame implements ActionListener {
     public Clip clip;
+    public static OnlineController onlineController;
+    public static boolean isOnlineMode = false;
+
     private JLabel statusLabel = new JLabel("WHITE's turn");
 
     private Chessboard chessboard;
@@ -102,7 +107,71 @@ public class ChessGameFrame extends JFrame implements ActionListener {
         addReloadButton();
         addTimeLeftButton();
     }
+    public ChessGameFrame(int width, int height, boolean theme, Start start, String userName, String name, String IP) {
+        ChessGameFrame.isOnlineMode = true;
+        this.start = start;
+        Style = theme;
+        setTitle("ChessGame"); //设置标题
+        this.WIDTH = width;
+        this.HEIGHT = height;
+        this.CHESSBOARD_SIZE = HEIGHT * 4 / 5;
+        setSize(WIDTH, HEIGHT);
+        setLocationRelativeTo(null); // Center the window.,
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
+
+        setLayout(null);
+
+        this.setVisible(true);
+        statusLabel.setLocation(HEIGHT, HEIGHT / 10);
+        statusLabel.setSize(200, 60);
+        statusLabel.setFont(new Font("Rockwell", Font.BOLD, 20));
+        add(statusLabel);
+
+        chessboard = new Chessboard(CHESSBOARD_SIZE, CHESSBOARD_SIZE, this);
+        gameController = new GameController(chessboard);
+        chessboard.setLocation(HEIGHT / 10, HEIGHT / 10);
+        add(chessboard);
+
+        if (theme) {
+            BackGroundPicture1.setSize(1000, 760);
+            this.getLayeredPane().add(BackGroundPicture1, Integer.valueOf(Integer.MIN_VALUE));
+            playBGM2();
+        } else {
+            BackGroundPicture2.setSize(1000, 760);
+            this.getLayeredPane().add(BackGroundPicture2, Integer.valueOf(Integer.MIN_VALUE));
+            playBGM1();
+        }
+        JPanel jPanel = (JPanel) this.getContentPane();
+        jPanel.setOpaque(false);
+
+
+        contentPane.setLocation(HEIGHT, HEIGHT / 10 + 60);
+        contentPane.setSize(200, 30);
+        contentPane.setOpaque(false);
+        add(contentPane);
+        addWindowListener(new WindowListener());
+
+        LoadChessBoard();
+        addLoadButton();
+        addReloadButton();
+        TimeLeft();
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                // 关闭与服务器的连接
+                onlineController.SendMessage("exit");
+                System.exit(0);
+            }
+        });
+        try {
+            this.onlineController = new OnlineController(chessboard, IP);
+        } catch (IOException E) {
+            E.printStackTrace();
+        }
+        onlineController.setUserName(userName);
+        onlineController.setOpName(name);
+    }
     public void playBGM1() {
         try {
             File musicPath;
@@ -351,9 +420,13 @@ public class ChessGameFrame extends JFrame implements ActionListener {
         jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
         this.add(jFileChooser1);
 
+
         jFileChooser1.setFileFilter(new FileFilter() {
             @Override
             public boolean accept(File f) {
+                if(f.getName().endsWith("json")){
+
+                }
                 return f.getName().endsWith("txt");
             }
 
@@ -371,6 +444,8 @@ public class ChessGameFrame extends JFrame implements ActionListener {
                 gameController.loadGameFromFile(file);
                 if (undoButton != null) undoButton.setEnabled(chessboard.canUndo());
                 if (redoButton != null) redoButton.setEnabled(chessboard.canRedo());
+
+
             }
         });
     }
@@ -415,5 +490,44 @@ public class ChessGameFrame extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
     }
+    private void LoadChessBoard() {
+        JButton button = new JButton("Load Board");
+        button.addActionListener((e) -> {
+            //
+        });
+        button.setLocation(HEIGHT, HEIGHT / 10 + 120);
+        button.setSize(200, 60);
+        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        add(button);
+    }//还没写完
+
+    private void TimeLeft() {
+        JButton button = new JButton("TimeLeft");
+        button.addActionListener((e) -> {
+            contentPane.removeAll();
+            contentPane.repaint();
+            contentPane.add(progressBar);
+            progressBar.setStringPainted(true);
+            progressBar.setBorderPainted(true);
+            progressBar.setLocation(HEIGHT, HEIGHT / 10);
+            progressBar.setUI(new BasicProgressBarUI() {
+                protected Color getSelectionBackground() {
+                    return Color.black;
+                }
+
+                protected Color getSelectionForeground() {
+                    return Color.black;
+                }
+            });
+            reloadProgressBar();
+            repaint();
+        });
+        button.setLocation(HEIGHT, HEIGHT / 10 + 480);
+        button.setSize(200, 60);
+        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        add(button);
+    }
+    Thread pUpdateThread;
+
 
 }

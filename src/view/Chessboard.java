@@ -72,6 +72,7 @@ public class Chessboard extends JComponent {
 
     public void reload() {
         initiateEmptyChessboard();
+        if (currentColor==ChessColor.BLACK){swapColor();}
         initKingOnBoard(0, 4, ChessColor.BLACK);
         initKingOnBoard(7, 4, ChessColor.WHITE);
 
@@ -121,6 +122,7 @@ public class Chessboard extends JComponent {
 
     public void swapChessComponents(ChessComponent chess1, ChessComponent chess2) {
         // Note that chess1 has higher priority, 'destroys' chess2 if exists.
+        ChessComponent chess = chess2;
         if (!(chess2 instanceof EmptySlotComponent)) {
             remove(chess2);
             add(chess2 = new EmptySlotComponent(chess2.getChessboardPoint(), chess2.getLocation(), clickController, CHESS_SIZE, this));
@@ -133,6 +135,12 @@ public class Chessboard extends JComponent {
 
         chess1.repaint();
         chess2.repaint();
+        if (chess.name == 'k') {
+            JOptionPane.showMessageDialog(this, "黑方获胜！", "对战结束！", JOptionPane.WARNING_MESSAGE);    //消息对话框}
+        }
+        if (chess.name == 'K') {
+            JOptionPane.showMessageDialog(this, "白方获胜！", "对战结束！", JOptionPane.WARNING_MESSAGE);    //消息对话框}
+        }
     }
 
     public void swapColor() {
